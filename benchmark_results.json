@@ -1,0 +1,153 @@
+[
+  {
+    "full_stub_validation": {
+      "end_to_end_time_s": 0.18160737515427172,
+      "exceeds_udp_friendly_limit": true,
+      "fetch_count": 7,
+      "network_bytes": 2878,
+      "response_size_bytes": 2878,
+      "validation_time_s": 0.12057012505829334
+    },
+    "proof_carrying_validation": {
+      "client_verification_time_s": 0.0018633338622748852,
+      "end_to_end_time_s": 0.15277708298526704,
+      "exceeds_udp_friendly_limit": true,
+      "fetch_count": 7,
+      "network_bytes": 2878,
+      "proof_generation_time_s": 0.10841108299791813,
+      "proof_size_bytes": 4932,
+      "resolver_end_to_end_time_s": 0.15084358304738998,
+      "response_size_bytes": 4932,
+      "transcript_hash": "54e2c8cad697c94f0f964da0fd67f7e396a3facd1c834b5298def7618e248090",
+      "validated_answer": {
+        "name": "cloudflare.com.",
+        "rdclass": "IN",
+        "rdtype": "A",
+        "records": [
+          "104.16.132.229",
+          "104.16.133.229"
+        ],
+        "ttl": 159
+      }
+    },
+    "query": {
+      "qname": "cloudflare.com",
+      "rdtype": "A"
+    },
+    "trust_the_resolver": {
+      "answer": {
+        "name": "cloudflare.com.",
+        "rdclass": "IN",
+        "rdtype": "A",
+        "records": [
+          "104.16.132.229",
+          "104.16.133.229"
+        ],
+        "ttl": 55
+      },
+      "end_to_end_time_s": 0.030258124927058816,
+      "exceeds_udp_friendly_limit": false,
+      "response_size_bytes": 64
+    }
+  },
+  {
+    "full_stub_validation": {
+      "end_to_end_time_s": 0.18963866704143584,
+      "exceeds_udp_friendly_limit": true,
+      "fetch_count": 7,
+      "network_bytes": 3424,
+      "response_size_bytes": 3424,
+      "validation_time_s": 0.14088516705669463
+    },
+    "proof_carrying_validation": {
+      "client_verification_time_s": 0.00461795786395669,
+      "end_to_end_time_s": 0.19239800004288554,
+      "exceeds_udp_friendly_limit": true,
+      "fetch_count": 7,
+      "network_bytes": 3424,
+      "proof_generation_time_s": 0.13384808297269046,
+      "proof_size_bytes": 5643,
+      "resolver_end_to_end_time_s": 0.18760154210031033,
+      "response_size_bytes": 5643,
+      "transcript_hash": "5c61efd1ff8fafbbc98ac2b98b022335112bf399d2d0495eb0cc83e289cfee45",
+      "validated_answer": {
+        "name": "ietf.org.",
+        "rdclass": "IN",
+        "rdtype": "A",
+        "records": [
+          "104.16.44.99",
+          "104.16.45.99"
+        ],
+        "ttl": 300
+      }
+    },
+    "query": {
+      "qname": "ietf.org",
+      "rdtype": "A"
+    },
+    "trust_the_resolver": {
+      "answer": {
+        "name": "ietf.org.",
+        "rdclass": "IN",
+        "rdtype": "A",
+        "records": [
+          "104.16.44.99",
+          "104.16.45.99"
+        ],
+        "ttl": 300
+      },
+      "end_to_end_time_s": 0.025702958926558495,
+      "exceeds_udp_friendly_limit": false,
+      "response_size_bytes": 58
+    }
+  },
+  {
+    "full_stub_validation": {
+      "end_to_end_time_s": 0.33121295808814466,
+      "exceeds_udp_friendly_limit": true,
+      "fetch_count": 7,
+      "network_bytes": 2722,
+      "response_size_bytes": 2722,
+      "validation_time_s": 0.21769291698001325
+    },
+    "proof_carrying_validation": {
+      "client_verification_time_s": 0.0026776669546961784,
+      "end_to_end_time_s": 0.6114284580107778,
+      "exceeds_udp_friendly_limit": true,
+      "fetch_count": 7,
+      "network_bytes": 2722,
+      "proof_generation_time_s": 0.20850366703234613,
+      "proof_size_bytes": 4693,
+      "resolver_end_to_end_time_s": 0.6086401250213385,
+      "response_size_bytes": 4693,
+      "transcript_hash": "f00940869accf226b1e28f98b0fd4ed76a013ce5ad4efbf54974f7d1db260b5e",
+      "validated_answer": {
+        "name": "nic.cz.",
+        "rdclass": "IN",
+        "rdtype": "A",
+        "records": [
+          "217.31.205.50"
+        ],
+        "ttl": 1800
+      }
+    },
+    "query": {
+      "qname": "nic.cz",
+      "rdtype": "A"
+    },
+    "trust_the_resolver": {
+      "answer": {
+        "name": "nic.cz.",
+        "rdclass": "IN",
+        "rdtype": "A",
+        "records": [
+          "217.31.205.50"
+        ],
+        "ttl": 1800
+      },
+      "end_to_end_time_s": 0.09173025004565716,
+      "exceeds_udp_friendly_limit": false,
+      "response_size_bytes": 40
+    }
+  }
+]

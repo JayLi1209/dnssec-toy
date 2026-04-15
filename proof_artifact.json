@@ -1,0 +1,164 @@
+{
+  "answer": {
+    "name": "cloudflare.com.",
+    "rdclass": "IN",
+    "rdtype": "A",
+    "records": [
+      "104.16.132.229",
+      "104.16.133.229"
+    ],
+    "ttl": 300
+  },
+  "metrics": {
+    "end_to_end_time_s": 0.16292312508448958,
+    "fetch_count": 7,
+    "fetched_wire_bytes": 2878,
+    "proof_generation_time_s": 0.11765954201109707,
+    "validation_time_s": 0.11752941692247987
+  },
+  "proof": {
+    "answer": {
+      "name": "cloudflare.com.",
+      "rdclass": "IN",
+      "rdtype": "A",
+      "records": [
+        "104.16.132.229",
+        "104.16.133.229"
+      ],
+      "ttl": 300
+    },
+    "answer_rrsig": {
+      "name": "cloudflare.com.",
+      "rdclass": "IN",
+      "rdtype": "RRSIG",
+      "records": [
+        "A 13 2 300 20260416041605 20260414021605 34505 cloudflare.com. CDlvXcC9MgpvmJXJvJ8g0xFD8tDdgtj3 PxOy11OTp6ELPHvL4EIuaqdrQ7ei40bR EUN64pyzrFiWOQ1bXWqHrw=="
+      ],
+      "ttl": 300
+    },
+    "chain": [
+      {
+        "child_zone": "com.",
+        "dnskey": {
+          "name": "com.",
+          "rdclass": "IN",
+          "rdtype": "DNSKEY",
+          "records": [
+            "256 3 13 5eHMITHLlTLKXKAZh1/ghH7lZOfDap0H VvPtxX0a6YE+6+EQ/D8MP66HLVaihA5B q1uhy0mQ3bVf6aUtuqtD0A==",
+            "256 3 13 i529KPLz+9AkrHsuDUvozFxk/jAcCaku 7WNyRKVlEubhh2x9Vimdi//ANLbNk/JW 1uZ53RNASSNvopgemNL9kw==",
+            "257 3 13 tx8EZRAd2+K/DJRV0S+hbBzaRPS/G6JV NBitHzqpsGlz8huE61Ms9ANe6NSDLKJt iTBqfTJWDAywEp1FCsEINQ=="
+          ],
+          "ttl": 2791
+        },
+        "dnskey_rrsig": {
+          "name": "com.",
+          "rdclass": "IN",
+          "rdtype": "RRSIG",
+          "records": [
+            "DNSKEY 13 1 86400 20260422140235 20260407135735 19718 com. S65Kk6xDZLy3bc+TZso5c/yA+49Ltwl2 zJp0jxlFSNJk12t/0xur/DMTjw/zZiYq OcV7yEFd0Z5vrlEH6FDf5w=="
+          ],
+          "ttl": 2791
+        },
+        "ds": {
+          "name": "com.",
+          "rdclass": "IN",
+          "rdtype": "DS",
+          "records": [
+            "19718 13 2 8acbb0cd28f41250a80a491389424d341522d946b0da0c0291f2d3d771d7805a"
+          ],
+          "ttl": 80391
+        },
+        "ds_rrsig": {
+          "name": "com.",
+          "rdclass": "IN",
+          "rdtype": "RRSIG",
+          "records": [
+            "DS 8 1 86400 20260427210000 20260414200000 54393 . MD6hGPhXImmuuEdArlrMbPrql39nYM93 x2UFbpMQsjCtGhdUnaVYb8T9QLcue7T8 fOfFRE3oQr4zH0ckPwdtkKDFkZKQWTUn NGEqxlvysjC+NPdIG1MWRtmTyQj48pNk iUVYc+kdftMMNErAaZ91vW0iRJwVqaWh IgzrpgQmZEgotGH0MqCNRyWzl50gq0YG dNQaSujP6+ppl8CLSVTfT7WYnh0X3138 w/J3aWgnGlvdAVusf4I297IapHdcm+nH i8vn56vQnfXDwos6B1BlHuLC/gCEDS/t XjNNoBGbDc26RcFtCjbu/uBzeSEBNYBB 6SU7GXp5vT7Chm1zOWP9Iw=="
+          ],
+          "ttl": 80391
+        },
+        "matched_key_tags": [
+          19718
+        ],
+        "parent_zone": "."
+      },
+      {
+        "child_zone": "cloudflare.com.",
+        "dnskey": {
+          "name": "cloudflare.com.",
+          "rdclass": "IN",
+          "rdtype": "DNSKEY",
+          "records": [
+            "256 3 13 oJMRESz5E4gYzS/q6XDrvU1qMPYIjCWz JaOau8XNEZeqCYKD5ar0IRd8KqXXFJkq mVfRvMGPmM1x8fGAa2XhSA==",
+            "257 3 13 mdsswUyr3DPW132mOi8V9xESWE8jTo0d xCjjnopKl+GqJxpVXckHAeF+KkxLbxIL fDLUT0rAK9iUzy1L53eKGQ=="
+          ],
+          "ttl": 3133
+        },
+        "dnskey_rrsig": {
+          "name": "cloudflare.com.",
+          "rdclass": "IN",
+          "rdtype": "RRSIG",
+          "records": [
+            "DNSKEY 13 2 3600 20260604045518 20260404045518 2371 cloudflare.com. hOfDOpTj4v8rwKweMjKnkC+k39byAsli l5xC7gOiS4NMIELXzzN5C9jsAh8KadiN pL99V5HIBZGQc6OwED1WIA=="
+          ],
+          "ttl": 3133
+        },
+        "ds": {
+          "name": "cloudflare.com.",
+          "rdclass": "IN",
+          "rdtype": "DS",
+          "records": [
+            "2371 13 2 32996839a6d808afe3eb4a795a0e6a7a39a76fc52ff228b22b76f6d63826f2b9"
+          ],
+          "ttl": 86400
+        },
+        "ds_rrsig": {
+          "name": "cloudflare.com.",
+          "rdclass": "IN",
+          "rdtype": "RRSIG",
+          "records": [
+            "DS 13 2 86400 20260419010040 20260411235040 35511 com. PFN3feLlhBdPMpLu3fehuckuTWyjimaX uCc3eY5wyH0XYt5HB8CB93pn3X6m0rPp owjjdbocGPlFh5P9S5WYMA=="
+          ],
+          "ttl": 86400
+        },
+        "matched_key_tags": [
+          2371
+        ],
+        "parent_zone": "com."
+      }
+    ],
+    "notes": [
+      "Positive answers only.",
+      "No NSEC or NSEC3 denial-of-existence support.",
+      "Artifact is explicit JSON so a succinct proof system can replace it later."
+    ],
+    "query": {
+      "qname": "cloudflare.com.",
+      "rdtype": "A"
+    },
+    "root_dnskey": {
+      "name": ".",
+      "rdclass": "IN",
+      "rdtype": "DNSKEY",
+      "records": [
+        "256 3 8 AwEAAb5dDYffpgAJ8VUGLwQtWXPlQWsj IFJtCM00/XaKU+8ln+ofah3q2KxEIjvz Qg+nqdxRj+8emtPne1mtYcbFWP4Q9E+D niOJLK09R05FuzvGbrG7DDdRDUX/cedF dV7O8pFEAYpJqYNR9BCTIAV973DO2bia uKSA31b7I2lK/woxoR1tf5cqJ4SMbJUv iuHicAEoUi2ATswloZNWd5T5thmEFZnx Fx7D5UgKCY7oflS7+GU7dNJwEtmFnWYV ETHN0kHXVz6aguouaAZp706YXNIoR/iT gQhmsR7XX+wL0Z8QM2LxQIyU6vRZ06Iy uJMGRMiwkSuGElbumyBt12JZbrU=",
+        "257 3 8 AwEAAa96jeuknZlaeSrvyAJj6ZHv28hh OKkx3rLGXVaC6rXTsDc449/cidltpkyG wCJNnOAlFNKF2jBosZBU5eeHspaQWOmO ElZsjICMQMC3aeHbGiShvZsx4wMYSjH8 e7Vrhbu6irwCzVBApESjbUdpWWmEnhat hWu1jo+siFUiRAAxm9qyJNg/wOZqqzL/ dL/q8PkcRU5oUKEpUge71M3ej2/7CPqp dVwuMoTvoB+ZOT4YeGyxMvHmbrxlFzGO HOijtzN+u1TQNatX2XBuzZNQ1K+s2CXk PIZo7s6JgZyvaBevYtxPvYLw4z9mR7K2 vaF18UYH9Z9GNUUeayffKC73PYc=",
+        "257 3 8 AwEAAaz/tAm8yTn4Mfeh5eyI96WSVexT BAvkMgJzkKTOiW1vkIbzxeF3+/4RgWOq 7HrxRixHlFlExOLAJr5emLvN7SWXgnLh 4+B5xQlNVz8Og8kvArMtNROxVQuCaSnI DdD5LKyWbRd2n9WGe2R8PzgCmr3EgVLr jyBxWezF0jLHwVN8efS3rCj/EWgvIWgb 9tarpVUDK/b58Da+sqqls3eNbuv7pr+e oZG+SrDK6nWeL3c6H5Apxz7LjVc1uTId sIXxuOLYA4/ilBmSVIzuDWfdRUfhHdY6 +cn8HFRm+2hM8AnXGXws9555KrUB5qih ylGa8subX2Nn6UwNR1AkUTV74bU="
+      ],
+      "ttl": 1807
+    },
+    "root_dnskey_rrsig": {
+      "name": ".",
+      "rdclass": "IN",
+      "rdtype": "RRSIG",
+      "records": [
+        "DNSKEY 8 0 172800 20260502000000 20260411000000 20326 . ldfPZ7Q9Ca8GfxnsJcPAMMy9Dt1qfL2g uvByLtN9kRcMMn8g3ukazjrv5Bj/KOLE XV++Zp8g8UpL/80NUKP4ZA1Yq3gmEE2h yEG7M964fUrTaB9w9leATi8UK176zkln B7trP81yL6TIZmaCImUMWVkUn8uGeIJU aVz2XpboM5PGo2gEQH2mVAavFammRoDb j4gnMJvXgOMIZtLIIGcOaxuY5sFQo1MD QnoQOYMAHVqdUu4Ld+Jq29ktutAXUK6h obUBss0me2y+xlu3fmZ5JiKSJOPDiBQB qjUAhueBKEZpamt/gr8NtHLe0QLKs2h3 XhsGNHE7Ksr3WwiCCFHP0A=="
+      ],
+      "ttl": 1807
+    },
+    "transcript_hash": "220b6244e3e1cdc47a0520b88f7e0b81fee5cb7ac19d18989fd0e37031e05da3",
+    "trust_anchor_name": ".",
+    "version": 1,
+    "zone": "cloudflare.com."
+  }
+}
