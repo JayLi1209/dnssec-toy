@@ -28,7 +28,7 @@ Not implemented:
 - Negative answers
 - Wildcards
 - CNAME chasing logic across signed zones
-- A real succinct proof system
+- Full DNSSEC validation inside a zk circuit
 
 ## Repository Layout
 
@@ -100,7 +100,61 @@ The artifact is deliberately verbose. It includes:
   matched key tags
 - a transcript hash over the canonicalized artifact
 
-This is a placeholder for a future succinct proof. The current client verifier replays the cryptographic checks against the explicit transcript instead of recomputing resolution work from the network.
+The current client verifier replays the cryptographic checks against the explicit transcript instead of recomputing resolution work from the network.
+
+## Circom Bridge
+
+This repository now includes a Circom circuit at [circom/transcript_commitment.circom](/Users/apple/Desktop/Security/dnssec-toy/circom/transcript_commitment.circom).
+
+What it proves today:
+
+- knowledge of the canonical proof-artifact bytes
+- binding to the public transcript hash
+- a Circom-friendly rolling commitment over the full padded artifact
+
+What it does not prove yet:
+
+- DNSKEY, DS, or RRSIG verification inside the circuit
+- SHA-256 or RSA checks inside the circuit
+- a full Groth16/PLONK proving flow checked into the repo
+
+The practical boundary is:
+
+1. Python still performs DNSSEC validation and emits the explicit artifact.
+2. The Circom circuit proves knowledge of the exact canonical artifact bytes that correspond to the published transcript hash and commitment.
+3. A future iteration can replace the rolling commitment with a hash gadget and then progressively move DNSSEC checks into-circuit.
+
+Example flow:
+
+```bash
+python3 -m pcdnssec compile-circom --build-dir build/circom
+
+python3 -m pcdnssec prepare-ptau \
+  --ptau build/circom/local_powers_of_tau_final.ptau \
+  --power 18
+
+python3 -m pcdnssec groth16-setup \
+  --build-dir build/circom \
+  --ptau build/circom/local_powers_of_tau_final.ptau
+
+python3 -m pcdnssec groth16-prove \
+  proof_artifact.json \
+  --build-dir build/circom
+
+python3 -m pcdnssec groth16-verify \
+  --build-dir build/circom
+
+python3 -m pcdnssec verify-circom-public \
+  proof_artifact.json \
+  build/circom/public.json
+```
+
+Notes:
+
+- `prepare-ptau` creates a local development Powers of Tau file so the workflow does not depend on a downloaded ceremony artifact.
+- For the current circuit size, Groth16 needs at least power `18`. `groth16-setup` now recomputes that requirement and regenerates the local ptau automatically if needed.
+- `groth16-setup` uses the initial setup key as the local development proving key. That is fine for this toy prototype, but it is not a substitute for a real multi-party ceremony.
+- The ptau/setup steps may take several minutes on a laptop because the circuit has one private byte signal per padded artifact byte.
 
 ## Benchmark Modes
 
@@ -151,6 +205,7 @@ The main tradeoff is visible already: client verification becomes much cheaper t
 - The trust anchor is treated as fixed input once `trust_anchor.json` is created.
 - The proof artifact is JSON to keep the transcript inspectable and debuggable.
 - The code is structured so a future zk proof system can replace the explicit transcript while preserving the resolver/verifier split.
+- The current Circom circuit is an integration bridge, not a full zk-DNSSEC verifier.
 
 ## Limitations
 
