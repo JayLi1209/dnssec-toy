@@ -1,0 +1,303 @@
+\documentclass[11pt]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{hyperref}
+\usepackage{enumitem}
+\usepackage{booktabs}
+
+\title{An Intuitive Research Overview of the DNSSEC Toy Prototype}
+\author{}
+\date{}
+
+\begin{document}
+
+\maketitle
+
+\section{Problem Setting}
+
+This repository studies a simple systems question:
+
+\begin{quote}
+\textbf{Can we give a DNS client stronger assurance than ``just trust the resolver,'' while avoiding the full cost of client-side DNSSEC validation?}
+\end{quote}
+
+The prototype explores one possible answer: let a resolver do the DNS fetching and DNSSEC validation once, package the checked evidence into an explicit proof artifact, and let clients verify that artifact locally.
+
+That leads to a concrete research question:
+
+\begin{quote}
+\textbf{Is proof-carrying DNSSEC validation a practical middle ground between blind trust in a resolver and full DNSSEC validation at every client?}
+\end{quote}
+
+\section{Background and Motivation}
+
+DNS maps names such as \texttt{cloudflare.com} to records such as IP addresses. DNSSEC adds signatures and delegation records so that a verifier can check whether a DNS answer is authentic and chained to a trusted root key.
+
+In the ordinary model, a client that wants strong assurance has to do substantial work itself:
+
+\begin{itemize}[nosep]
+    \item fetch the answer RRset and its signature,
+    \item fetch DNSKEY and DS records along the chain of trust,
+    \item validate signatures at each step, and
+    \item confirm that the final answer is signed by a trusted zone key.
+\end{itemize}
+
+That is fine for a full validator, but not ideal for lightweight clients, intermittently connected devices, or designs where we want offline verification of a previously fetched response. The prototype therefore asks whether validation work can be \emph{shifted} without collapsing all assurance back into ``trust the resolver.''
+
+\section{Research Question and Hypothesis}
+
+The repository is best understood as evaluating the following hypothesis:
+
+\begin{quote}
+\textbf{Hypothesis.} A resolver can export enough explicit DNSSEC evidence that a client can replay the critical checks locally, obtaining much lower verification cost than full stub validation, while retaining stronger assurance than a plain unsigned resolver response.
+\end{quote}
+
+This immediately creates three comparison points:
+
+\begin{enumerate}[nosep]
+    \item \textbf{Normal DNS resolution.} Lowest latency and bandwidth for the client, but weakest assurance.
+    \item \textbf{Full validating stub.} Strong assurance, but higher client-side fetch and validation cost.
+    \item \textbf{Recursive-resolver-assisted validation.} The recursive resolver performs the heavy DNSSEC work and returns the full material a client would otherwise need to construct or verify locally.
+\end{enumerate}
+
+The goal of this project is not to replace DNSSEC, but to restructure \emph{who performs which work} and how the resulting evidence is transported.
+
+\section{System Design}
+
+The current implementation has two main roles.
+
+\subsection*{Resolver side}
+
+The resolver:
+
+\begin{enumerate}[nosep]
+    \item fetches a positive DNSSEC answer,
+    \item discovers the signed zone apex,
+    \item fetches the root DNSKEY RRset,
+    \item walks the DS/DNSKEY chain from the root to the answering zone,
+    \item validates every step using ordinary DNSSEC logic, and
+    \item emits a structured JSON proof artifact.
+\end{enumerate}
+
+The artifact includes:
+
+\begin{itemize}[nosep]
+    \item query metadata,
+    \item the validated answer RRset and its RRSIG,
+    \item the root DNSKEY RRset and its RRSIG,
+    \item one explicit chain link per delegation with DS, DNSKEY, and matched key tags, and
+    \item a transcript hash over the canonicalized artifact.
+\end{itemize}
+
+\subsection*{Client side}
+
+The client receives the answer plus artifact and checks:
+
+\begin{itemize}[nosep]
+    \item that the query name and type match,
+    \item that the answer payload matches the claimed answer,
+    \item that the transcript hash matches the artifact contents,
+    \item that each DS/DNSKEY link validates, and
+    \item that the final answer RRset validates under the zone DNSKEY RRset.
+\end{itemize}
+
+The important design point is that the client does \emph{not} re-fetch DNS material from the network. It verifies a portable transcript of the resolver's work.
+
+\section{How the Prototype Answers the Question}
+
+The prototype answers the research question by building and measuring a concrete proof-carrying workflow rather than proposing a purely conceptual architecture.
+
+More specifically, it tests whether the following claim is borne out in code:
+
+\begin{quote}
+An explicit DNSSEC transcript can preserve the key cryptographic checks of validation while moving most of the network and transcript-construction work away from the client.
+\end{quote}
+
+This is why the codebase contains both:
+
+\begin{itemize}[nosep]
+    \item a resolver/verifier split for explicit proof replay, and
+    \item a benchmark harness that compares the proof-carrying path against two natural baselines.
+\end{itemize}
+
+\section{Experimental Setup}
+
+The checked-in benchmark harness measures all three modes on signed positive \texttt{A} queries:
+
+\begin{enumerate}[nosep]
+    \item \textbf{Baseline 1: Normal latency and bandwidth.} A simple DNS query is sent to the recursive resolver and the returned answer is accepted directly. This baseline captures the operational minimum for client-visible latency and response size.
+    \item \textbf{Baseline 2: Stub does everything.} The client acts as a full validating stub: it fetches the answer, DNSKEY RRsets, DS RRsets, and signatures, then validates the entire DNSSEC structure itself.
+    \item \textbf{Baseline 3: Recursive resolver handles all tasks the client would otherwise need.} The recursive resolver fetches and validates the chain, packages the full validation material into an explicit artifact, and sends that evidence to the client for local replay verification.
+\end{enumerate}
+
+The sample data currently checked into the repository covers three signed domains:
+
+\begin{itemize}[nosep]
+    \item \texttt{cloudflare.com A}
+    \item \texttt{ietf.org A}
+    \item \texttt{nic.cz A}
+\end{itemize}
+
+The benchmark reports:
+
+\begin{itemize}[nosep]
+    \item end-to-end latency,
+    \item proof generation time,
+    \item client verification time,
+    \item fetched network bytes for DNSSEC validation, and
+    \item artifact size.
+\end{itemize}
+
+\section{Baselines}
+
+The baseline choice is important because each baseline represents a different trust/performance point.
+
+\subsection*{Baseline 1: Normal latency and bandwidth}
+
+This is the conventional DNS experience. The recursive resolver returns the final answer and the client measures only ordinary response latency and bandwidth. It is the cheapest operational point, but it provides no explicit DNSSEC evidence to the client.
+
+\subsection*{Baseline 2: Stub does everything}
+
+This is the strongest client-side baseline. The stub performs all fetches and validates the entire structure itself: answer RRset, answer RRSIG, root DNSKEY RRset, DS links, child DNSKEY RRsets, and the final zone signature chain. This is the baseline that a proof-carrying design must beat on client-side cost if it is to be worthwhile.
+
+\subsection*{Baseline 3: Recursive resolver handles all client work}
+
+This is the proof-carrying setting instantiated by the prototype. The recursive resolver performs the expensive DNSSEC work, constructs the explicit transcript, and returns all material the client needs for local verification. The client no longer fetches DNSSEC support records itself, but it still checks the returned structure cryptographically.
+
+\section{Results from the Checked-In Data}
+
+Table~\ref{tab:results} summarizes the current benchmark data already present in \texttt{benchmark\_results.json}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrrrrr}
+\toprule
+Query & B1 Lat. (s) & B1 Bytes & B2 Lat. (s) & B2 Bytes & B3 Total (s) & B3 Bytes \\
+\midrule
+\texttt{cloudflare.com A} & 0.030 & 64   & 0.182 & 2878 & 0.153 & 4932 \\
+\texttt{ietf.org A}       & 0.026 & 58   & 0.190 & 3424 & 0.192 & 5643 \\
+\texttt{nic.cz A}         & 0.092 & 40   & 0.331 & 2722 & 0.611 & 4693 \\
+\bottomrule
+\end{tabular}
+\caption{Baseline results from the checked-in benchmark data. B1 = normal DNS resolution, B2 = full validating stub, B3 = recursive-resolver-assisted proof-carrying validation.}
+\label{tab:results}
+\end{table}
+
+Because baseline 3 has both a resolver-side cost and a client-side replay cost, Table~\ref{tab:proofdetail} expands that mode further.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{lrrr}
+\toprule
+Query & B3 Resolver (s) & B3 Client Replay (s) & B3 Artifact (B) \\
+\midrule
+\texttt{cloudflare.com A} & 0.151 & 0.0019 & 4932 \\
+\texttt{ietf.org A}       & 0.188 & 0.0046 & 5643 \\
+\texttt{nic.cz A}         & 0.609 & 0.0027 & 4693 \\
+\bottomrule
+\end{tabular}
+\caption{Breakdown of baseline 3 into resolver-side construction and client-side replay verification.}
+\label{tab:proofdetail}
+\end{table}
+
+Across these three examples:
+
+\begin{itemize}[nosep]
+    \item mean normal-resolution latency is about \textbf{0.049 s},
+    \item mean normal-resolution response size is about \textbf{54 B},
+    \item mean full-validating-stub latency is about \textbf{0.234 s},
+    \item mean full-validating-stub fetched bandwidth is about \textbf{3008 B},
+    \item mean recursive-resolver-assisted total time is about \textbf{0.319 s},
+    \item mean recursive-resolver-assisted \emph{client replay verification} time is about \textbf{0.0031 s}, and
+    \item mean proof artifact size is about \textbf{5.1 KB}.
+\end{itemize}
+
+These measurements suggest a clear tradeoff:
+
+\begin{itemize}[nosep]
+    \item baseline 1 is the cheapest path in both latency and bytes, but it gives the client no explicit validation evidence;
+    \item baseline 2 makes the client do all of the DNSSEC work, costing about 0.18--0.33 seconds and roughly 2.7--3.4 KB of fetched DNS material in these runs;
+    \item baseline 3 shifts almost all client work back to the resolver: client replay itself is only about 1.9--4.6 ms, but the transmitted artifact grows to about 4.7--5.6 KB.
+\end{itemize}
+
+\section{Interpretation}
+
+The checked-in results support the main hypothesis in a limited but meaningful sense.
+
+They show that proof-carrying validation can indeed behave like a middle point:
+
+\begin{itemize}[nosep]
+    \item it gives stronger assurance than normal DNS resolution, because the client replays the DNSSEC checks over explicit evidence;
+    \item it is much lighter for the client than a full validating stub, because the client avoids all DNS fetching and only verifies the transcript;
+    \item it introduces a new cost in artifact size, because the transcript is deliberately verbose.
+\end{itemize}
+
+So the prototype does not claim ``better in every dimension.'' Instead it demonstrates a plausible exchange:
+
+\begin{quote}
+\textbf{pay more bytes to send evidence, in order to save client-side validation work and preserve cryptographic transparency.}
+\end{quote}
+
+\section{What Is Already Implemented}
+
+The current code is sufficient for a real first experiment because it already implements:
+
+\begin{itemize}[nosep]
+    \item positive-answer DNSSEC transcript construction,
+    \item explicit DS/DNSKEY chain validation to a fixed trust anchor,
+    \item replay verification from a JSON artifact,
+    \item benchmark comparison against two baselines, and
+    \item a Circom bridge that binds a proof to the exact artifact bytes.
+\end{itemize}
+
+That means the research story in this repository is not just aspirational. There is already an executable end-to-end path for the main design idea.
+
+\section{What the Circom Component Means}
+
+The Circom circuit should be described carefully. It is not yet a zero-knowledge DNSSEC verifier.
+
+What it currently contributes is a boundary for future work:
+
+\begin{itemize}[nosep]
+    \item the Python code defines the exact artifact to be proved,
+    \item the artifact has a canonical transcript hash,
+    \item the circuit proves knowledge of the canonical artifact bytes corresponding to the public commitment.
+\end{itemize}
+
+So the circuit is best viewed as an integration bridge from explicit transcript verification toward future succinct or zero-knowledge proofs.
+
+\section{Limitations and Threats to Validity}
+
+This remains a toy prototype, and the limitations should be stated explicitly.
+
+\begin{itemize}[nosep]
+    \item Only positive signed answers are handled.
+    \item Negative answers, NSEC/NSEC3 proofs, wildcards, and broader recursive corner cases are out of scope.
+    \item The benchmark is small and uses only three signed domains.
+    \item The artifact is optimized for clarity, not compactness.
+    \item The current benchmark is a prototype measurement harness rather than a controlled large-scale evaluation.
+    \item The Circom layer does not yet move DNSSEC signature verification in-circuit.
+\end{itemize}
+
+These are not just engineering gaps; they also mark the current boundary of the research claim.
+
+\section{Natural Next Experiments}
+
+If this overview is expanded into a report or paper, the next experiments should be:
+
+\begin{enumerate}[nosep]
+    \item vary the domain set and zone depth to study how artifact size and verification time scale with chain length;
+    \item measure more record types such as \texttt{AAAA} and \texttt{MX};
+    \item benchmark repeated client verification of the same artifact to model many-client reuse;
+    \item compare JSON artifacts against a more compact binary encoding;
+    \item extend the experiment suite to negative answers and NSEC/NSEC3 proofs.
+\end{enumerate}
+
+\section{One-Sentence Takeaway}
+
+This repository shows that proof-carrying DNSSEC validation is a credible middle-ground design: the resolver can export explicit cryptographic evidence, the client can verify it quickly without re-fetching DNS data, and the current prototype already demonstrates that tradeoff on real signed domains.
+
+\end{document}
