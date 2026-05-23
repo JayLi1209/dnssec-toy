@@ -1,6 +1,8 @@
 # Proof-Carrying DNSSEC Validation Prototype
 
-This repository contains a toy prototype for proof-carrying DNSSEC validation.
+This repository contains a toy prototype for proof-carrying DNSSEC validation, serving as the final project for CSCI 780: Distributed Systems Security.
+
+Work done by Yuanhe Li and Colin Soule.
 
 The model is:
 
